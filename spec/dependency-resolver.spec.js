@@ -1,4 +1,4 @@
-var DependencyResolver = require('../build/DependencyResolver');
+var DependencyResolver = require('../index.js');
 
 describe('dependency-resolver', function () {
 
