@@ -6,7 +6,7 @@ DependencyResolver
 ```js
 var DependencyResolver = require('dependency-resolver'); //if in node env
 
-var resolver = new DependencyResolver(); //or new fcc.DependencyResolver(); when in browser env
+var resolver = new DependencyResolver(); //or new grom.DependencyResolver(); when in browser env
 resolver.add('a');
 resolver.add('b');
 resolver.add('c');

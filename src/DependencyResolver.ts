@@ -1,4 +1,4 @@
-module fcc {
+module grom {
 
   class Service {
     public dependencies:Service[] = []
@@ -65,5 +65,5 @@ module fcc {
 
 declare var module: any;
 if (typeof module !== 'undefined') {
-  module.exports = fcc.DependencyResolver;
+  module.exports = grom.DependencyResolver;
 }
