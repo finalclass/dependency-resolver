@@ -18,7 +18,16 @@ resolver.setDependency('c', 'a');
 resolver.setDependency('b', 'a');
 
 resolver.resolve('d'); //=> ['a', 'b', 'c', 'd'];
+resolver.sort(); // => ['a', 'b', 'c', 'd'];
 ```
+
+### resolver.resolve(serviceName:string):string[]
+
+Resolves dependencies of `serviceName`.
+
+### resolver.sort():string[]
+
+Returns all services in the right order.
 
 ## License - ISC
 
