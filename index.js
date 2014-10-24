@@ -1,11 +1,11 @@
-var fcc;
-(function (fcc) {
-    var Service = (function () {
-        function Service(name) {
+var grom;
+(function (grom) {
+    var DepService = (function () {
+        function DepService(name) {
             this.name = name;
             this.dependencies = [];
         }
-        return Service;
+        return DepService;
     })();
     var DependencyResolver = (function () {
         function DependencyResolver() {
@@ -18,7 +18,12 @@ var fcc;
             if (this.services[serviceName]) {
                 return this.services[serviceName];
             }
-            return this.services[serviceName] = new Service(serviceName);
+            this.services[serviceName] = new DepService(serviceName);
+            //Add dependency to root element for sort function to work
+            if (serviceName !== DependencyResolver.ROOT_SERVICE_NAME) {
+                this.setDependency(DependencyResolver.ROOT_SERVICE_NAME, serviceName);
+            }
+            return this.services[serviceName];
         };
         DependencyResolver.prototype.setDependency = function (serviceName, dependencyName) {
             var service = this.addAndGet(serviceName);
@@ -30,10 +35,15 @@ var fcc;
             var unresolved = [];
             var service = this.services[serviceName];
             if (!service) {
-                throw new Error('Service ' + serviceName + ' does not exist');
+                throw new Error('DepService ' + serviceName + ' does not exist');
             }
             this.recursiveResolve(service, resolved, unresolved);
             return resolved.map(function (s) { return s.name; });
+        };
+        DependencyResolver.prototype.sort = function () {
+            var deps = this.resolve(DependencyResolver.ROOT_SERVICE_NAME);
+            deps.pop(); //remove DependencyResolver.ROOT_SERVICE_NAME element
+            return deps;
         };
         DependencyResolver.prototype.recursiveResolve = function (service, resolved, unresolved) {
             var _this = this;
@@ -49,10 +59,11 @@ var fcc;
             resolved.push(service);
             unresolved.splice(unresolved.indexOf(service), 1);
         };
+        DependencyResolver.ROOT_SERVICE_NAME = '#root#';
         return DependencyResolver;
     })();
-    fcc.DependencyResolver = DependencyResolver;
-})(fcc || (fcc = {}));
+    grom.DependencyResolver = DependencyResolver;
+})(grom || (grom = {}));
 if (typeof module !== 'undefined') {
-    module.exports = fcc.DependencyResolver;
+    module.exports = grom.DependencyResolver;
 }

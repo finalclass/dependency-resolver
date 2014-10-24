@@ -1,17 +1,21 @@
 module grom {
 
-  class Service {
-    public dependencies:Service[] = []
-    constructor(public name:string){}
+  class DepService {
+    public dependencies:DepService[] = []
+    constructor(public name:string){
+
+    }
   }
 
-  interface IServiceHash {
-    [id:string]:Service;
+  interface IDepServiceHash {
+    [id:string]:DepService;
   }
 
   export class DependencyResolver {
 
-    private services:IServiceHash = {};
+    private static ROOT_SERVICE_NAME:string = '#root#';
+
+    private services:IDepServiceHash = {};
 
     constructor() {
 
@@ -21,33 +25,44 @@ module grom {
       this.addAndGet(name);
     }
 
-    private addAndGet(serviceName:string):Service {
+    private addAndGet(serviceName:string):DepService {
       if (this.services[serviceName]) {
         return this.services[serviceName];
       }
-      return this.services[serviceName] = new Service(serviceName);
+      this.services[serviceName] = new DepService(serviceName);
+      //Add dependency to root element for sort function to work
+      if (serviceName !== DependencyResolver.ROOT_SERVICE_NAME) { //avoid circular depdency of root service
+        this.setDependency(DependencyResolver.ROOT_SERVICE_NAME, serviceName);
+      }
+      return this.services[serviceName];
     }
 
     public setDependency(serviceName:string, dependencyName:string):void {
-      var service:Service = this.addAndGet(serviceName);
-      var dependency:Service = this.addAndGet(dependencyName);
+      var service:DepService = this.addAndGet(serviceName);
+      var dependency:DepService = this.addAndGet(dependencyName);
       service.dependencies.push(dependency);
     }
 
     public resolve(serviceName:string):string[] {
-      var resolved:Service[] = [];
-      var unresolved:Service[] = [];
-      var service:Service = this.services[serviceName];
+      var resolved:DepService[] = [];
+      var unresolved:DepService[] = [];
+      var service:DepService = this.services[serviceName];
       if (!service) {
-        throw new Error('Service ' + serviceName + ' does not exist');
+        throw new Error('DepService ' + serviceName + ' does not exist');
       }
       this.recursiveResolve(service, resolved, unresolved);
-      return resolved.map((s:Service):string => s.name);
+      return resolved.map((s:DepService):string => s.name);
     }
 
-    private recursiveResolve(service:Service, resolved:Service[], unresolved:Service[]):void {
+    public sort():string[] {
+      var deps:string[] = this.resolve(DependencyResolver.ROOT_SERVICE_NAME);
+      deps.pop(); //remove DependencyResolver.ROOT_SERVICE_NAME element
+      return deps;
+    }
+
+    private recursiveResolve(service:DepService, resolved:DepService[], unresolved:DepService[]):void {
       unresolved.push(service);
-      service.dependencies.forEach((sub:Service) => {
+      service.dependencies.forEach((sub:DepService) => {
         if (resolved.indexOf(sub) === -1) {
           if (unresolved.indexOf(sub) !== -1) {
             throw new Error('Circular reference detected: ' + service.name + ' -> ' + sub.name);

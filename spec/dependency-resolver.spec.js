@@ -39,4 +39,25 @@ describe('dependency-resolver', function () {
     expect(resolver.resolve.bind(this, 'b')).toThrow();
   });
 
+  it('sorts', function () {
+    var resolver = new DependencyResolver();
+    resolver.add('a');
+    resolver.add('b');
+    resolver.add('c');
+    resolver.add('d');
+    resolver.add('e');
+    resolver.add('f');
+    resolver.add('g');
+
+    resolver.setDependency('a', 'b');
+    resolver.setDependency('a', 'c');
+    resolver.setDependency('c', 'd');
+    resolver.setDependency('c', 'e');
+    resolver.setDependency('e', 'g');
+
+    //This test is not good
+    //it's just a possible solution:
+    expect(resolver.sort()).toEqual(['b', 'd', 'g', 'e', 'c', 'a', 'f']);
+  });
+
 });
