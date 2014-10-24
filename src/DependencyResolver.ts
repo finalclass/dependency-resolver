@@ -43,6 +43,12 @@ module grom {
       service.dependencies.push(dependency);
     }
 
+    public each(func:(serv:string)=>void):void {
+      Object.keys(this.services).forEach((key:string):void => {
+        func(this.services[key]);
+      });
+    }
+
     public resolve(serviceName:string):string[] {
       var resolved:DepService[] = [];
       var unresolved:DepService[] = [];
