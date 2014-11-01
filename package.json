@@ -1,6 +1,6 @@
 {
   "name": "dependency-resolver",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "DependencyResolver class for resolving dependency tree",
   "main": "index.js",
   "scripts": {
